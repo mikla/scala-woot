@@ -18,8 +18,8 @@ case class SiteId(value: String) extends AnyVal {
 
 case class CharId(siteId: String, operationClock: OperationClock) extends Id {
   override def <(that: Id): Boolean = that match {
-    case Beginning =>
+    case Beginning => false
     case CharId(sid, clock) => (siteId < sid) || (siteId == sid && operationClock < clock)
-    case Ending =>
+    case Ending => true
   }
 }
