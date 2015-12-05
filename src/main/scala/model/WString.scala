@@ -3,6 +3,11 @@ package model
 case class WString(siteId: SiteId,
                    chars: Vector[WChar] = Vector.empty) {
 
+  lazy val visible = chars.filter(_.isVisible)
+
+  // ## The visible text
+  lazy val text: String = visible.map(_.char).mkString
+
   def length = ???
 
   /** Returns the element at position `pos`.
@@ -38,9 +43,6 @@ case class WString(siteId: SiteId,
 
   /** Returns `true` if `c` can be found is `WString`. */
   def contains(c: WChar): Boolean = ???
-
-  /** The sequence of visible `WChar`s. */
-  def value: String = ???
 
   /** Returns the i-th visible character of `WString`. */
   def ithVisible(i: Int): WChar = ???
