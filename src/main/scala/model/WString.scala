@@ -1,7 +1,7 @@
 package model
 
 case class WString(siteId: SiteId,
-              chars: Vector[WChar] = Vector.empty) {
+                   chars: Vector[WChar] = Vector.empty) {
 
   def length = ???
 
@@ -12,7 +12,7 @@ case class WString(siteId: SiteId,
 
   def pos(id: Id): Int = id match {
     case Beginning => 0
-    case Ending => chars.length - 1
+    case Ending => chars.length
     case _ => chars.indexWhere(_.id == id)
   }
 
@@ -22,7 +22,19 @@ case class WString(siteId: SiteId,
   }
 
   /** Returns the part of the `WString` between elements `start` end `end`, both are not included. */
-  def subseq(start: Id, end: Id): Vector[WChar] = ???
+  def subseq(start: Id, end: Id): Vector[WChar] = {
+    val from = start match {
+      case Beginning => 0
+      case id => pos(id) + 1
+    }
+
+    val until = end match {
+      case Ending => chars.length
+      case id => pos(id)
+    }
+
+    chars.slice(from, until)
+  }
 
   /** Returns `true` if `c` can be found is `WString`. */
   def contains(c: WChar): Boolean = ???
