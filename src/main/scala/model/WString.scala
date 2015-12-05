@@ -1,19 +1,30 @@
 package model
 
-class WString(siteId: SiteId,
+case class WString(siteId: SiteId,
               chars: Vector[WChar] = Vector.empty) {
 
   def length = ???
 
+  /** Returns the element at position `pos`.
+    * We state that the first element is at position 0.
+    */
   def indexOf(pos: Int): WChar = ???
 
-  def pos(c: Id): Int = ???
+  def pos(id: Id): Int = id match {
+    case Beginning => 0
+    case Ending => chars.length - 1
+    case _ => chars.indexWhere(_.id == id)
+  }
 
-  def insert(c: WChar, position: Int): WString = ???
+  def insert(c: WChar, position: Int): WString = {
+    val (before, after) = chars splitAt position
+    copy(chars = (before :+ c) ++ after)
+  }
 
   /** Returns the part of the `WString` between elements `start` end `end`, both are not included. */
   def subseq(start: Id, end: Id): Vector[WChar] = ???
 
+  /** Returns `true` if `c` can be found is `WString`. */
   def contains(c: WChar): Boolean = ???
 
   /** The sequence of visible `WChar`s. */
@@ -22,6 +33,9 @@ class WString(siteId: SiteId,
   /** Returns the i-th visible character of `WString`. */
   def ithVisible(i: Int): WChar = ???
 
+  /** Placing `c` among all the characters between `prev` and `next`. These characters can be previously deleted
+    * characters or characters inserted by concurrent operations.
+    */
   def integrateIns(c: WChar, prev: Id, next: Id): WString = {
     val sub: Vector[WChar] = subseq(prev, next)
     if (sub.isEmpty) insert(c, pos(next))
@@ -33,8 +47,10 @@ class WString(siteId: SiteId,
     }
   }
 
-  /** Building an `L` vector of chars. Based on algorithm described in `RT groupware without OT`, page 11.
-    */
-  def trim(chars: Vector[WChar], perv: Id, next: Id): Vector[Id] = ???
+  /** Remove the characters that have a previous or next character is `chars` */
+  def trim(chars: Vector[WChar], perv: Id, next: Id): Vector[Id] = for {
+    c <- chars
+    if chars.forall(x => x.id != c.next && x.id != c.prev)
+  } yield c.id
 
 }
