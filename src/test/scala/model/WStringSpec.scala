@@ -8,9 +8,9 @@ class WStringSpec extends FlatSpec with Matchers {
     import WChars._
     val wstring = WString(SiteId("A"), chars = Vector(A, B))
 
-    wstring.pos(Beginning) should equal(0)
-    wstring.pos(Ending) should equal(wstring.chars.length)
-    wstring.pos(CharId("A", OperationClock(1))) should equal(1)
+    wstring.pos(Beginning) should equal (0)
+    wstring.pos(Ending) should equal (wstring.chars.length)
+    wstring.pos(CharId("A", OperationClock(1))) should equal (1)
   }
 
   "subseq" should "return sub sequence of chars from start index to end index both are not included" in {
@@ -18,21 +18,29 @@ class WStringSpec extends FlatSpec with Matchers {
     val wstring = WString(SiteId("A"), chars = Vector(A, B, C, D, F))
 
     val sub = wstring.subseq(A.id, F.id)
-    sub.size should equal(3)
-    sub should equal(Vector(B, C, D))
+    sub.size should equal (3)
+    sub should equal (Vector(B, C, D))
   }
 
   "text" should "return text representation of WString" in {
     import WChars._
 
     val abcdf = WString(SiteId("A"), chars = Vector(A, B, C, D, F))
-    abcdf.text should equal("abcdf")
+    abcdf.text should equal ("abcdf")
 
     val empty = WString(SiteId("A"))
-    empty.text should be("")
+    empty.text should be ("")
   }
 
-  "integrateIns" should "place characters to the right position" in {
+  "integrateIns" should "place just signle WChar at right pisition" in {
+    import WChars._
+    val wstring = WString(SiteId("A"), chars = Vector(A, B))
+    val acb = wstring.integrateIns(C, A.id, B.id)
+
+    acb.chars should equal (Vector(A, C, B))
+  }
+
+  it should "place characters to the right position" in {
     import WChars._
 
     /** Let's say we have a text entered by SiteId("A")
@@ -56,8 +64,34 @@ class WStringSpec extends FlatSpec with Matchers {
       .integrateIns(G, J.id, Ending)
       .integrateIns(Y, F.id, newLine.id)
 
-    println(t.text)
+    t.text should equal ("abcdfy\nejg")
+  }
 
+  "integrateDel" should "set for WChar isVisible = false" in {
+    import WChars._
+
+    val wstring = WString(SiteId("A"), chars = Vector(A, B, C, D, F))
+
+    val acdf = wstring.integrateDel(B)
+
+    acdf.text should be ("acdf")
+    acdf.chars.find(_.id == B.id).foreach(_.isVisible should equal (false))
+  }
+
+  it should "delete WChars from the beginning of the WString" in {
+    import WChars._
+
+    val wstring = WString(SiteId("A"), chars = Vector(A, B, C, D, F))
+    val bcdf = wstring.integrateDel(A)
+    bcdf.text should equal ("bcdf")
+  }
+
+  it should "delete WChars from the end if the String" in {
+    import WChars._
+
+    val wstring = WString(SiteId("A"), chars = Vector(A, B, C, D, F))
+    val bcdf = wstring.integrateDel(F)
+    bcdf.text should equal ("abcd")
   }
 
   // private

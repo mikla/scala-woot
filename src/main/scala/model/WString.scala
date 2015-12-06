@@ -61,6 +61,14 @@ case class WString(siteId: SiteId,
     }
   }
 
+  /** Delete `WChat` and return new `WString`. */
+  def integrateDel(c: WChar): WString = {
+    val cPos = chars.indexWhere(_.id == c.id)
+    val replacement = c.copy(isVisible = false)
+    val (before, after) = chars splitAt cPos
+    copy(chars = (before :+ replacement) ++ (after drop 1))
+  }
+
   /** Remove the characters that have a previous or next character is `chars` */
   def trim(chars: Vector[WChar], perv: Id, next: Id): Vector[Id] = for {
     c <- chars
