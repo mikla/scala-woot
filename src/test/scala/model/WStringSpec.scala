@@ -67,6 +67,23 @@ class WStringSpec extends FlatSpec with Matchers {
     t.text should equal ("abcdfy\nejg")
   }
 
+  it should "just test" in {
+
+    val A = WChar(CharId("A", OperationClock(0)), 'a', Beginning, Ending, isVisible = true)
+    val B = WChar(CharId("A", OperationClock(1)), 'b', A.id, Ending, isVisible = true)
+    val C = WChar(CharId("A", OperationClock(2)), 'c', B.id, Ending, isVisible = true)
+    val D = WChar(CharId("A", OperationClock(3)), 'd', C.id, Ending, isVisible = true)
+    val F = WChar(CharId("A", OperationClock(4)), 'f', D.id, Ending, isVisible = true)
+
+    val wstring = WString(SiteId("A"), chars = Vector(A, B, C, D, F))
+
+    // from another planer
+    val O = WChar(CharId("B", OperationClock(0)), 'o', Beginning, Ending, isVisible = true)
+
+    println(wstring.integrateIns(O, O.prev, O.next).text)
+
+  }
+
   "integrateDel" should "set for WChar isVisible = false" in {
     import WChars._
 

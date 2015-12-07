@@ -55,6 +55,8 @@ case class WString(siteId: SiteId,
     if (sub.isEmpty) insert(c, pos(next))
     else {
       val L = prev +: trim(sub, prev, next) :+ next
+      println("trim: " + trim(sub, prev, next))
+      println("L is: " + L.mkString(","))
       var i = 1
       while ((i < L.length) && (L(i) < c.id)) i = i + 1
       integrateIns(c, L(i - 1), L(i))
