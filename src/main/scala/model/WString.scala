@@ -69,10 +69,38 @@ case class WString(siteId: SiteId,
     copy(chars = (before :+ replacement) ++ (after drop 1))
   }
 
+  /** Integrate remote operation */
   def integrateOperation(op: Operation): WString = {
     // If isExecutable(op)
+    op match {
+      case InsertOp(c) =>
+        integrateIns(c, c.prev, c.next)
+      case DeleteOp(c) =>
+        integrateDel(c)
+    }
+  }
+
+  def insert(c: Char, pos: Int): (Operation, WString) = {
+    // get ithVisibe
+    // create WChar
+    // val wstr = integrateIns(WChar)
+    // (InsertOp(Wchar), wstr.copy(tick = newTick))
 
     ???
+  }
+
+  def delete(pos: Int): (Operation, WString) = {
+    // get ithVisible WChar
+    // wstr = integrateDel(WChar)
+    // (DeleteOp(Wchar), wstr.copy(tick = newTick))
+
+    ???
+  }
+
+  def isExecutable(op: Operation): Boolean = op match {
+    case InsertOp(c) =>
+
+    case DeleteOp(c) => contains(c)
   }
 
 }
