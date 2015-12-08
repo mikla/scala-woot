@@ -1,14 +1,14 @@
 package model
 
+import model.Helper._
+
 case class WString(siteId: SiteId,
                    chars: Vector[WChar] = Vector.empty) {
 
   lazy val visible = chars.filter(_.isVisible)
 
-  // ## The visible text
+  // The visible text
   lazy val text: String = visible.map(_.char).mkString
-
-  def length = ???
 
   /** Returns the element at position `pos`.
     * We state that the first element is at position 0.
@@ -54,16 +54,14 @@ case class WString(siteId: SiteId,
     val sub: Vector[WChar] = subseq(prev, next)
     if (sub.isEmpty) insert(c, pos(next))
     else {
-      val L = prev +: trim(sub, prev, next) :+ next
-      println("trim: " + trim(sub, prev, next))
-      println("L is: " + L.mkString(","))
+      val L = prev +: trim(sub) :+ next
       var i = 1
       while ((i < L.length) && (L(i) < c.id)) i = i + 1
       integrateIns(c, L(i - 1), L(i))
     }
   }
 
-  /** Delete `WChat` and return new `WString`. */
+  /** Delete `WChar` and return new `WString`. */
   def integrateDel(c: WChar): WString = {
     val cPos = chars.indexWhere(_.id == c.id)
     val replacement = c.copy(isVisible = false)
@@ -71,10 +69,10 @@ case class WString(siteId: SiteId,
     copy(chars = (before :+ replacement) ++ (after drop 1))
   }
 
-  /** Remove the characters that have a previous or next character is `chars` */
-  def trim(chars: Vector[WChar], perv: Id, next: Id): Vector[Id] = for {
-    c <- chars
-    if chars.forall(x => x.id != c.next && x.id != c.prev)
-  } yield c.id
+  def integrateOperation(op: Operation): WString = {
+    // If isExecutable(op)
+
+    ???
+  }
 
 }
