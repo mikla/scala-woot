@@ -41,8 +41,8 @@ case class WString(siteId: SiteId,
     chars.slice(from, until)
   }
 
-  /** Returns `true` if `c` can be found is `WString`. */
-  def contains(c: WChar): Boolean = ???
+  /** Returns `true` if `c` can be found is `WString` by its `id` */
+  def contains(id: Id): Boolean = chars.exists(_.id == id)
 
   /** Returns the i-th visible character of `WString`. */
   def ithVisible(i: Int): WChar = ???
@@ -98,9 +98,10 @@ case class WString(siteId: SiteId,
   }
 
   def isExecutable(op: Operation): Boolean = op match {
-    case InsertOp(c) =>
-
-    case DeleteOp(c) => contains(c)
+    case InsertOp(c) => canIntegrate(c.prev) && canIntegrate(c.next)
+    case DeleteOp(c) => contains(c.id)
   }
+
+  private def canIntegrate(id: Id): Boolean = id == Beginning || id == Ending || contains(id)
 
 }

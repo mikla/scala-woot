@@ -94,6 +94,30 @@ class WStringSpec extends FlatSpec with Matchers {
     bcdf.text should equal ("abcd")
   }
 
+  "contains" should "check if WChar with that id contains in WString" in {
+    import WChars._
+    val wstring = WString(SiteId("A"), chars = Vector(A, B, C))
+
+    wstring.contains(A.id) should equal (true)
+    wstring.contains(D.id) should equal (false)
+  }
+
+  "isExecutable" should "check whether its possible to integrate operation into WString" in {
+    import WChars._
+    val wstring = WString(SiteId("A"), chars = Vector(A, B, C))
+
+    val F = WChar(CharId("B", OperationClock(0)), 'f', B.id, C.id)
+
+    val R = WChar(CharId("B", OperationClock(1)), 'r', B.id, C.id)
+    val S = WChar(CharId("B", OperationClock(2)), 's', R.id, Ending)
+
+    wstring.isExecutable(InsertOp(F)) should equal (true)
+    wstring.isExecutable(InsertOp(S)) should equal (false)
+
+    wstring.isExecutable(DeleteOp(B)) should equal (true)
+    wstring.isExecutable(DeleteOp(S)) should equal (false)
+  }
+
   // private
 
   private object WChars {
