@@ -1,5 +1,7 @@
 package model
 
+import scala.language.implicitConversions
+
 trait Id {
   def <(that: Id): Boolean
 }
@@ -16,10 +18,14 @@ case class SiteId(value: String) extends AnyVal {
   def <(that: SiteId) = this.value < that.value
 }
 
-case class CharId(siteId: String, operationClock: OperationClock) extends Id {
+case class CharId(siteId: SiteId, operationClock: OperationClock) extends Id {
   override def <(that: Id): Boolean = that match {
     case Beginning => false
     case CharId(sid, clock) => (siteId < sid) || (siteId == sid && operationClock < clock)
     case Ending => true
   }
+}
+
+object SiteId {
+  implicit def strToSiteId(str: String): SiteId = SiteId(str)
 }

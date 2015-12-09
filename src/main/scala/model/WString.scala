@@ -3,6 +3,7 @@ package model
 import model.Helper._
 
 case class WString(siteId: SiteId,
+                   nextTick: OperationClock,
                    chars: Vector[WChar] = Vector.empty) {
 
   lazy val visible = chars.filter(_.isVisible)
@@ -45,7 +46,10 @@ case class WString(siteId: SiteId,
   def contains(id: Id): Boolean = chars.exists(_.id == id)
 
   /** Returns the i-th visible character of `WString`. */
-  def ithVisible(i: Int): WChar = ???
+  def ithVisible(i: Int): WChar = {
+    if (i < visible.length) visible(i)
+    else throw new RuntimeException(s"ithVisible($i) does not exist")
+  }
 
   /** Placing `c` among all the characters between `prev` and `next`. These characters can be previously deleted
     * characters or characters inserted by concurrent operations.
@@ -71,18 +75,30 @@ case class WString(siteId: SiteId,
 
   /** Integrate remote operation */
   def integrateOperation(op: Operation): WString = {
-    // If isExecutable(op)
-    op match {
-      case InsertOp(c) =>
-        integrateIns(c, c.prev, c.next)
-      case DeleteOp(c) =>
-        integrateDel(c)
+    if (isExecutable(op)) {
+      op match {
+        case InsertOp(c) =>
+          integrateIns(c, c.prev, c.next)
+        case DeleteOp(c) =>
+          integrateDel(c)
+      }
+    } else {
+      // 1. Add operation to the queue.
+      // 2. Return new WString with not executed operation.
+      this
     }
   }
 
+  /** Generates an operation for network broadcasting plus
+    * returning WString after applying insert operation.
+    * Positions counts from 0.
+    */
   def insert(c: Char, pos: Int): (Operation, WString) = {
-    // get ithVisibe
-    // create WChar
+
+    val prev = if (pos == 0) Beginning else ithVisible(pos-1).id
+    val next = if (pos >= visible.length) Ending else ithVisible(pos)
+
+//    val wchar = WChar(CharId(siteId))
     // val wstr = integrateIns(WChar)
     // (InsertOp(Wchar), wstr.copy(tick = newTick))
 

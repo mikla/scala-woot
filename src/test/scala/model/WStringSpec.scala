@@ -6,7 +6,7 @@ class WStringSpec extends FlatSpec with Matchers {
 
   "pos" should "return a position of character by Id" in {
     import WChars._
-    val wstring = WString(SiteId("A"), chars = Vector(A, B))
+    val wstring = WString(SiteId("A"), OperationClock(2), chars = Vector(A, B))
 
     wstring.pos(Beginning) should equal (0)
     wstring.pos(Ending) should equal (wstring.chars.length)
@@ -15,9 +15,8 @@ class WStringSpec extends FlatSpec with Matchers {
 
   "subseq" should "return sub sequence of chars from start index to end index both are not included" in {
     import WChars._
-    val wstring = WString(SiteId("A"), chars = Vector(A, B, C, D, F))
 
-    val sub = wstring.subseq(A.id, F.id)
+    val sub = ABCDF.subseq(A.id, F.id)
     sub.size should equal (3)
     sub should equal (Vector(B, C, D))
   }
@@ -25,16 +24,15 @@ class WStringSpec extends FlatSpec with Matchers {
   "text" should "return text representation of WString" in {
     import WChars._
 
-    val abcdf = WString(SiteId("A"), chars = Vector(A, B, C, D, F))
-    abcdf.text should equal ("abcdf")
+    ABCDF.text should equal ("abcdf")
 
-    val empty = WString(SiteId("A"))
+    val empty = WString(SiteId("A"), OperationClock(0))
     empty.text should be ("")
   }
 
   "integrateIns" should "place just signle WChar at right pisition" in {
     import WChars._
-    val wstring = WString(SiteId("A"), chars = Vector(A, B))
+    val wstring = WString(SiteId("A"), OperationClock(2), chars = Vector(A, B))
     val acb = wstring.integrateIns(C, A.id, B.id)
 
     acb.chars should equal (Vector(A, C, B))
@@ -48,7 +46,6 @@ class WStringSpec extends FlatSpec with Matchers {
       * EJG
       */
 
-    val wstring = WString(SiteId("A"), chars = Vector(A, B, C, D, F))
 
     val newLine = WChar(CharId("B", OperationClock(0)), '\n', F.id, Ending, isVisible = true)
     val E = WChar(CharId("B", OperationClock(1)), 'e', newLine.id, Ending, isVisible = true)
@@ -58,7 +55,7 @@ class WStringSpec extends FlatSpec with Matchers {
     /** SiteId("A") continue typing into 1st line */
     val Y = WChar(CharId("A", OperationClock(5)), 'y', F.id, newLine.id, isVisible = true)
 
-    val t = wstring.integrateIns(newLine, F.id, Ending)
+    val t = ABCDF.integrateIns(newLine, F.id, Ending)
       .integrateIns(E, newLine.id, Ending)
       .integrateIns(J, E.id, Ending)
       .integrateIns(G, J.id, Ending)
@@ -70,9 +67,7 @@ class WStringSpec extends FlatSpec with Matchers {
   "integrateDel" should "set for WChar isVisible = false" in {
     import WChars._
 
-    val wstring = WString(SiteId("A"), chars = Vector(A, B, C, D, F))
-
-    val acdf = wstring.integrateDel(B)
+    val acdf = ABCDF.integrateDel(B)
 
     acdf.text should be ("acdf")
     acdf.chars.find(_.id == B.id).foreach(_.isVisible should equal (false))
@@ -81,22 +76,20 @@ class WStringSpec extends FlatSpec with Matchers {
   it should "delete WChars from the beginning of the WString" in {
     import WChars._
 
-    val wstring = WString(SiteId("A"), chars = Vector(A, B, C, D, F))
-    val bcdf = wstring.integrateDel(A)
+    val bcdf = ABCDF.integrateDel(A)
     bcdf.text should equal ("bcdf")
   }
 
   it should "delete WChars from the end if the String" in {
     import WChars._
 
-    val wstring = WString(SiteId("A"), chars = Vector(A, B, C, D, F))
-    val bcdf = wstring.integrateDel(F)
+    val bcdf = ABCDF.integrateDel(F)
     bcdf.text should equal ("abcd")
   }
 
   "contains" should "check if WChar with that id contains in WString" in {
     import WChars._
-    val wstring = WString(SiteId("A"), chars = Vector(A, B, C))
+    val wstring = WString(SiteId("A"), OperationClock(3), chars = Vector(A, B, C))
 
     wstring.contains(A.id) should equal (true)
     wstring.contains(D.id) should equal (false)
@@ -104,7 +97,7 @@ class WStringSpec extends FlatSpec with Matchers {
 
   "isExecutable" should "check whether its possible to integrate operation into WString" in {
     import WChars._
-    val wstring = WString(SiteId("A"), chars = Vector(A, B, C))
+    val wstring = WString(SiteId("A"), OperationClock(3), chars = Vector(A, B, C))
 
     val F = WChar(CharId("B", OperationClock(0)), 'f', B.id, C.id)
 
@@ -118,6 +111,16 @@ class WStringSpec extends FlatSpec with Matchers {
     wstring.isExecutable(DeleteOp(S)) should equal (false)
   }
 
+  "ithVisible" should "return i-th visible element in the WString" in {
+    import WChars._
+
+    val ac = ABCDF.integrateDel(B)
+
+    ac.ithVisible(0) should equal (A)
+    ac.ithVisible(1) should equal (C)
+    ac.ithVisible(3) should equal (F)
+  }
+
   // private
 
   private object WChars {
@@ -126,6 +129,8 @@ class WStringSpec extends FlatSpec with Matchers {
     val C = WChar(CharId("A", OperationClock(2)), 'c', Beginning, Ending, isVisible = true)
     val D = WChar(CharId("A", OperationClock(3)), 'd', Beginning, Ending, isVisible = true)
     val F = WChar(CharId("A", OperationClock(4)), 'f', Beginning, Ending, isVisible = true)
+
+    val ABCDF = WString(SiteId("A"), OperationClock(5), chars = Vector(A, B, C, D, F))
   }
 
 }
