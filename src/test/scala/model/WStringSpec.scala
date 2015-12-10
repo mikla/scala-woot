@@ -9,6 +9,7 @@ class WStringSpec extends FlatSpec with Matchers {
     val wstring = WString(SiteId("A"), OperationClock(2), chars = Vector(A, B))
 
     wstring.pos(Beginning) should equal (0)
+
     wstring.pos(Ending) should equal (wstring.chars.length)
     wstring.pos(CharId("A", OperationClock(1))) should equal (1)
   }
