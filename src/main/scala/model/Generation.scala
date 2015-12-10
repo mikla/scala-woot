@@ -2,4 +2,5 @@ package model
 
 trait Generation {
 
+
 }
