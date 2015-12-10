@@ -9,7 +9,6 @@ class WStringSpec extends FlatSpec with Matchers {
     val wstring = WString(SiteId("A"), OperationClock(2), chars = Vector(A, B))
 
     wstring.pos(Beginning) should equal (0)
-
     wstring.pos(Ending) should equal (wstring.chars.length)
     wstring.pos(CharId("A", OperationClock(1))) should equal (1)
   }
@@ -120,6 +119,29 @@ class WStringSpec extends FlatSpec with Matchers {
     ac.ithVisible(0) should equal (A)
     ac.ithVisible(1) should equal (C)
     ac.ithVisible(3) should equal (F)
+  }
+
+  "insert" should "insert single char to empty WString" in {
+    val siteA = SiteId("A")
+    val empty = WString(siteA, OperationClock(0))
+    val (op, wstr) = empty.insert('a', 0)
+
+    wstr.text should equal ("a")
+  }
+
+  it should "insert chat to non-empty WString" in {
+    import WChars._
+    val siteA = SiteId("A")
+    val empty = WString(siteA, OperationClock(1), chars = Vector(A, B))
+
+    val (_, cab) = empty.insert('c', 0)
+    cab.text should equal ("cab")
+
+    val (_, acb) = empty.insert('c', 1)
+    acb.text should equal ("acb")
+
+    val (_, abc) = empty.insert('c', 2)
+    acb.text should equal ("acb")
   }
 
   // private

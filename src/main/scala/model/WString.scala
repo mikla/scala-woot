@@ -3,7 +3,7 @@ package model
 import model.Helper._
 
 case class WString(siteId: SiteId,
-                   nextTick: OperationClock,
+                   nextClock: OperationClock,
                    chars: Vector[WChar] = Vector.empty) {
 
   lazy val visible = chars.filter(_.isVisible)
@@ -94,15 +94,13 @@ case class WString(siteId: SiteId,
     * Positions counts from 0.
     */
   def insert(c: Char, pos: Int): (Operation, WString) = {
+    val prevId = if (pos == 0) Beginning else ithVisible(pos - 1).id
+    val nextId = if (pos >= visible.length) Ending else ithVisible(pos).id
 
-    val prev = if (pos == 0) Beginning else ithVisible(pos-1).id
-    val next = if (pos >= visible.length) Ending else ithVisible(pos)
+    val wchar = WChar(CharId(siteId, nextClock), c, prevId, nextId)
+    val wstr = integrateIns(wchar, prevId, nextId)
 
-//    val wchar = WChar(CharId(siteId))
-    // val wstr = integrateIns(WChar)
-    // (InsertOp(Wchar), wstr.copy(tick = newTick))
-
-    ???
+    (InsertOp(wchar), wstr.copy(nextClock = nextClock.next))
   }
 
   def delete(pos: Int): (Operation, WString) = {
@@ -120,4 +118,8 @@ case class WString(siteId: SiteId,
 
   private def canIntegrate(id: Id): Boolean = id == Beginning || id == Ending || contains(id)
 
+}
+
+object WString {
+  def empty(siteId: SiteId) = WString(siteId, OperationClock(0))
 }
