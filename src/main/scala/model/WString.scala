@@ -104,11 +104,9 @@ case class WString(siteId: SiteId,
   }
 
   def delete(pos: Int): (Operation, WString) = {
-    // get ithVisible WChar
-    // wstr = integrateDel(WChar)
-    // (DeleteOp(Wchar), wstr.copy(tick = newTick))
-
-    ???
+    val wchar = ithVisible(pos)
+    val wstr = integrateDel(wchar)
+    (DeleteOp(wchar), wstr)
   }
 
   def isExecutable(op: Operation): Boolean = op match {

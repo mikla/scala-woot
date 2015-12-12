@@ -2,6 +2,7 @@ package model
 
 import org.scalatest.{Matchers, FlatSpec}
 
+
 class WStringSpec extends FlatSpec with Matchers {
 
   "pos" should "return a position of character by Id" in {
@@ -132,16 +133,29 @@ class WStringSpec extends FlatSpec with Matchers {
   it should "insert chat to non-empty WString" in {
     import WChars._
     val siteA = SiteId("A")
-    val empty = WString(siteA, OperationClock(1), chars = Vector(A, B))
+    val ab = WString(siteA, OperationClock(1), chars = Vector(A, B))
 
-    val (_, cab) = empty.insert('c', 0)
+    val (_, cab) = ab.insert('c', 0)
     cab.text should equal ("cab")
 
-    val (_, acb) = empty.insert('c', 1)
+    val (_, acb) = ab.insert('c', 1)
     acb.text should equal ("acb")
 
-    val (_, abc) = empty.insert('c', 2)
+    val (_, abc) = ab.insert('c', 2)
     acb.text should equal ("acb")
+  }
+
+  "delete" should "delete character at position" in {
+    import WChars._
+
+    val (_, abcf) = ABCDF.delete(3)
+    abcf.text should equal ("abcf")
+
+    val (_, bcdf) = ABCDF.delete(0)
+    bcdf.text should equal ("bcdf")
+
+    val (_, abcd) = ABCDF.delete(4)
+    abcd.text should equal ("abcd")
   }
 
   // private
