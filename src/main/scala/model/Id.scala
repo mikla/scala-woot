@@ -15,7 +15,7 @@ object Ending extends Id {
 }
 
 case class SiteId(value: String) extends AnyVal {
-  def <(that: SiteId) = this.value < that.value
+  def <(that: SiteId): Boolean = this.value < that.value
 }
 
 case class CharId(siteId: SiteId, operationClock: OperationClock) extends Id {

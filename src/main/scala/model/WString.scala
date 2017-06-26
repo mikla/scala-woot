@@ -6,7 +6,7 @@ case class WString(siteId: SiteId,
                    nextClock: OperationClock,
                    chars: Vector[WChar] = Vector.empty) {
 
-  lazy val visible = chars.filter(_.isVisible)
+  lazy val visible: Vector[WChar] = chars.filter(_.isVisible)
 
   // The visible text
   lazy val text: String = visible.map(_.char).mkString
